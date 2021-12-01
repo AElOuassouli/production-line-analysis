@@ -9,7 +9,7 @@ import util_viz as uviz
 
 
 PLOT = False
-TESTS_FOLDER = "./tests/anomaly_detection"
+TESTS_FOLDER = "./plots/anomaly_detection"
 
 # Parsing the YAML FILE
 yaml_data = uyaml.load_yaml_content_for_file()
@@ -75,7 +75,7 @@ for object_id in yaml_data:
                 ## Third parameter : epsilon
                 ## Anomaly labels in df. Column name: anomaly_dbscan
                 print("Anomaly detection - DBSCAN")
-                df = uad.dbscan_based_ad(df, int(0.05*len(df)), 5, True, object_id, TESTS_FOLDER )
+                df = uad.dbscan_based_ad(df, int(0.05*len(df)), 5)
                 print("Anomaly detection - DBSCAN - Ended")
                 # Anomaly events analysis
 
