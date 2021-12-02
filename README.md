@@ -4,7 +4,13 @@
 
 You can create the environment used for this repository using the requirement.txt file. Please execute at the commande prompt: 
 
-`conda create --name <env> --file requirement.txt`
+`conda create --name <env> --file requirements.txt --channel default --channel conda-forge`
+
+Then, 
+
+`conda activate <env>`
+
+with `<env>` the name of your environement.
 
 ## Execution 
 
