@@ -114,3 +114,4 @@ dmypy.json
 .pyre/
 graph.yaml
 sandbox.db
+results.txt
