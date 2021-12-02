@@ -1,7 +1,11 @@
 import os
 from pyvis.network import Network
 
+import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+
+
 import networkx as nx
 
 #################### Production line graph #######################
@@ -15,6 +19,9 @@ def plot_prodcution_graph_networkx(yaml_dict, results, filename):
     
     modules_node = []
     modules_size = []
+    modules_colors = []
+
+    no_data_nodes = []
     
     buffer_nodes = []
     artifct_nodes = []
@@ -26,11 +33,12 @@ def plot_prodcution_graph_networkx(yaml_dict, results, filename):
         if yaml_dict[obj]['type'] == 'module':
             graph.add_node(obj)
             pos_modules[obj] = (yaml_dict[obj]['position'][0], yaml_dict[obj]['position'][1])
-            if obj == "LUGE":
-                modules_size.append(20)
+            if not results[obj]["cycles_CYCLE_TIME"]:
+                no_data_nodes.append(obj) 
             else :
                 modules_size.append(results[obj]["cycles_CYCLE_TIME"])
-            modules_node.append(obj)
+                modules_colors.append(results[obj]["cycles_MTTF"] )
+                modules_node.append(obj)
             node_labels[obj] = yaml_dict[obj]['display']
         elif yaml_dict[obj]['type'] == 'buffer':
             graph.add_node(obj)
@@ -56,15 +64,30 @@ def plot_prodcution_graph_networkx(yaml_dict, results, filename):
                 graph.add_edge(yaml_dict[obj]['upstream'], obj, color="black")
    
     
-    plt.figure(figsize=(17, 10))
+    plt.figure(figsize=(20, 10))
     
+    cmap = matplotlib.cm.get_cmap('Reds')
+
     nx.draw_networkx_edges(graph, pos)
-    nx.draw_networkx_nodes(graph, pos, 
+    
+    nc = nx.draw_networkx_nodes(graph, pos, 
                             nodelist=modules_node,
                             node_size=modules_size, 
-                            node_color="red", 
+                            node_color=modules_colors,
+                            cmap= cmap,
                             node_shape="o",
-                            label="Module")
+                            label="Module (Node size = Cycle Time)")
+    nc.set_norm(mcolors.LogNorm())
+    cbar = plt.colorbar(nc, aspect=20, shrink=0.55)
+    cbar.set_label("Mean Time To Fail (log scale)")
+
+    nx.draw_networkx_nodes(graph, pos, 
+                            nodelist=no_data_nodes,
+                            node_size=30, 
+                            node_color="black",
+                            cmap= cmap,
+                            node_shape="H",
+                            label = "Module with no data")
     
     nx.draw_networkx_nodes(graph, pos, 
                             nodelist=buffer_nodes, 
@@ -93,7 +116,10 @@ def plot_prodcution_graph_networkx(yaml_dict, results, filename):
                             verticalalignment="bottom")
     
     
-    plt.legend()
+    legend = plt.legend()
+    for item in legend.legendHandles:
+        item._sizes = [40]
+    
     plt.tight_layout()
     plt.savefig(filename)
 
