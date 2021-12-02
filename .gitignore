@@ -115,3 +115,5 @@ dmypy.json
 graph.yaml
 sandbox.db
 results.txt
+production_graph.html
+production_graph.png
